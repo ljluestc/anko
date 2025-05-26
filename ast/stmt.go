@@ -31,6 +31,162 @@ type IfStmt struct {
 	Else   Stmt
 }
 
+// Stmt provides all interfaces for statements.
+type Stmt interface {
+	Pos
+}
+
+// StmtImpl provides common implementations for Stmt.
+type StmtImpl struct {
+	PosImpl
+}
+
+// StmtsStmt provides statements.
+type StmtsStmt struct {
+	StmtImpl
+	Stmts []Stmt
+}
+
+// VarStmt provides statement for variable declaration.
+type VarStmt struct {
+	StmtImpl
+	Names []string
+	Exprs []Expr
+}
+
+// LetsStmt provides statement for multiple variable assignment.
+type LetsStmt struct {
+	StmtImpl
+	LHSS []Expr
+	RHSS []Expr
+}
+
+// LetMapItemStmt provides statement of let for map item.
+type LetMapItemStmt struct {
+	StmtImpl
+	LHSS []Expr
+	RHS  Expr
+}
+
+// IfStmt provides statement for if/else.
+type IfStmt struct {
+	StmtImpl
+	If     Expr
+	Then   Stmt
+	ElseIf []*IfStmt
+	Else   Stmt
+}
+
+// TryStmt provides statement for try/catch/finally.
+type TryStmt struct {
+	StmtImpl
+	Try     Stmt
+	Var     string
+	Catch   Stmt
+	Finally Stmt
+}
+
+// LoopStmt provides statement for for-loop.
+type LoopStmt struct {
+	StmtImpl
+	Expr Expr
+	Stmt Stmt
+}
+
+// ForStmt provides statement for for-loop.
+type ForStmt struct {
+	StmtImpl
+	Vars  []string
+	Value Expr
+	Stmt  Stmt
+}
+
+// CForStmt provides statement for sea-like for-loop.
+type CForStmt struct {
+	StmtImpl
+	Stmt1 Stmt
+	Expr2 Expr
+	Expr3 Expr
+	Stmt  Stmt
+}
+
+// ThrowStmt provides statement for throw.
+type ThrowStmt struct {
+	StmtImpl
+	Expr Expr
+}
+
+// ModuleStmt provides statement for module.
+type ModuleStmt struct {
+	StmtImpl
+	Name string
+	Stmt Stmt
+}
+
+// SwitchStmt provides switch statement.
+type SwitchStmt struct {
+	StmtImpl
+	Expr    Expr
+	Cases   []Stmt
+	Default Stmt
+}
+
+// SwitchCaseStmt provides switch case statement.
+type SwitchCaseStmt struct {
+	StmtImpl
+	Exprs []Expr
+	Stmt  Stmt
+}
+
+// ExprStmt provides expression statement.
+type ExprStmt struct {
+	StmtImpl
+	Expr Expr
+}
+
+// GoroutineStmt provides statement to support launching a new goroutine.
+type GoroutineStmt struct {
+	StmtImpl
+	Expr Expr
+}
+
+// DeleteStmt provides statement for deleting an item from a map.
+type DeleteStmt struct {
+	StmtImpl
+	Item Expr
+	Key  Expr
+}
+
+// CloseStmt provides statement for closing a channel.
+type CloseStmt struct {
+	StmtImpl
+	Expr Expr
+}
+
+// BreakStmt provides statement for break.
+type BreakStmt struct {
+	StmtImpl
+}
+
+// ContinueStmt provides statement for continue.
+type ContinueStmt struct {
+	StmtImpl
+}
+
+// ReturnStmt provides statement for return.
+type ReturnStmt struct {
+	StmtImpl
+	Exprs []Expr
+}
+
+// ChanStmt provides statement for receiving channel data.
+type ChanStmt struct {
+	StmtImpl
+	LHS    Expr
+	OkExpr Expr
+	RHS    Expr
+}
+
 // TryStmt provide "try/catch/finally" statement.
 type TryStmt struct {
 	StmtImpl

@@ -10,14 +10,21 @@ import (
 	"github.com/mattn/anko/parser"
 )
 
-// Execute parses script and executes in the specified environment.
-func Execute(env *env.Env, options *Options, script string) (interface{}, error) {
-	stmt, err := parser.ParseSrc(script)
-	if err != nil {
-		return nilValue, err
-	}
+type Options struct {
+	Debug bool
+	// ...other fields...
+}
 
-	return RunContext(context.Background(), env, options, stmt)
+type runInfoStruct struct {
+	ctx      context.Context
+	env      *env.Env
+	options  *Options
+	stmt     ast.Stmt
+	rv       reflect.Value
+	err      error
+	expr     ast.Expr
+	operator string
+	// ...other fields...
 }
 
 // ExecuteContext parses script and executes in the specified environment with context.

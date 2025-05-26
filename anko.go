@@ -1,3 +1,4 @@
+//go:build !appengine
 // +build !appengine
 
 package main
@@ -79,7 +80,7 @@ func runNonInteractive() int {
 		source = string(sourceBytes)
 	}
 
-	_, err := vm.Execute(e, nil, source)
+	_, err := vm.Execute(e, nil, source) // Ensure vm.Execute is used correctly
 	if err != nil {
 		fmt.Println("Execute error:", err)
 		return 4

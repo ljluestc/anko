@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 
 	"github.com/mattn/anko/ast"
 )
@@ -17,6 +18,8 @@ const (
 	EOF = -1
 	// EOL is short for End of line.
 	EOL = '\n'
+	// ILLEGAL is used for illegal tokens.
+	ILLEGAL = -2
 )
 
 // Error is a parse error.
@@ -548,6 +551,13 @@ eos:
 			case 't':
 				ret = append(ret, '\t')
 				continue
+			case 'u':
+				tok, val := s.scanEscape()
+				if tok == ILLEGAL {
+					return "", errors.New(val.(string))
+				}
+				ret = append(ret, []rune(val.(string))...)
+				continue
 			}
 			ret = append(ret, s.peek())
 			continue
@@ -556,6 +566,56 @@ eos:
 		}
 	}
 	return string(ret), nil
+}
+
+// scanEscape handles escape sequences like \uXXXX
+func (s *Scanner) scanEscape() (tok int, val interface{}) {
+	if s.offset >= len(s.src) { // Fix invalid operation
+		return ILLEGAL, "incomplete escape sequence"
+	}
+
+	c := s.src[s.offset]
+	s.offset++
+
+	if c != 'u' {
+		switch c {
+		case 'n':
+			return STRING, "\n"
+		case 't':
+			return STRING, "\t"
+		case 'r':
+			return STRING, "\r"
+		case '\\':
+			return STRING, "\\"
+		default:
+			return ILLEGAL, fmt.Sprintf("invalid escape \\%c", c)
+		}
+	}
+
+	if s.offset+4 > len(s.src) { // Fix invalid operation
+		return ILLEGAL, "incomplete Unicode escape"
+	}
+
+	hex := string(s.src[s.offset : s.offset+4])
+	s.offset += 4
+
+	for _, h := range hex {
+		if !strings.ContainsRune("0123456789ABCDEFabcdef", h) {
+			return ILLEGAL, fmt.Sprintf("invalid Unicode escape \\u%s", hex)
+		}
+	}
+
+	n, err := strconv.ParseUint(hex, 16, 32)
+	if err != nil {
+		return ILLEGAL, fmt.Sprintf("invalid Unicode escape \\u%s: %v", hex, err)
+	}
+
+	r := rune(n)
+	if !utf8.ValidRune(r) {
+		return ILLEGAL, fmt.Sprintf("invalid Unicode rune \\u%s", hex)
+	}
+
+	return STRING, string(r)
 }
 
 // Lexer provides interface to parse codes.

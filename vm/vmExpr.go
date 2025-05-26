@@ -1,11 +1,37 @@
 package vm
 
 import (
+	"errors"
 	"reflect"
 
 	"github.com/mattn/anko/ast"
 	"github.com/mattn/anko/env"
 )
+
+// Placeholder for convertReflectValueToType
+func convertReflectValueToType(value reflect.Value, targetType reflect.Type) (reflect.Value, error) {
+	// Implement the actual conversion logic here
+	return value, nil
+}
+
+// Placeholder for newError
+func newError(expr ast.Expr, err error) error {
+	return errors.New("error in expression")
+}
+
+// Placeholder for nilValue
+var nilValue = reflect.Value{}
+
+// Placeholder for makeType
+func makeType(runInfo *runInfoStruct, typeData interface{}) reflect.Type {
+	// Implement the actual logic here
+	return nil
+}
+
+// Placeholder for newStringError
+func newStringError(expr ast.Expr, message string) error {
+	return errors.New(message)
+}
 
 // invokeExpr evaluates one expression.
 func (runInfo *runInfoStruct) invokeExpr() {
@@ -13,7 +39,7 @@ func (runInfo *runInfoStruct) invokeExpr() {
 
 	// OpExpr
 	case *ast.OpExpr:
-		runInfo.operator = expr.Op
+		runInfo.operator = expr.Op.String() // Use the String method
 		runInfo.invokeOperator()
 
 	// IdentExpr

@@ -477,3 +477,11 @@ func processCallReturnValues(rvs []reflect.Value, isRunVMFunction bool, convertT
 	// convert to error
 	return nilValue, rvError.Interface().(error)
 }
+
+func reflectValueSlicetoInterfaceSlice(values []reflect.Value) reflect.Value {
+	result := make([]interface{}, len(values))
+	for i, v := range values {
+		result[i] = v.Interface()
+	}
+	return reflect.ValueOf(result)
+}
